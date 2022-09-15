@@ -1,9 +1,26 @@
-use crate::bytecode_types::{ByteCode, Variable, Result, Codes};
+use crate::bytecode_types::{ByteCode, Variable, Result, Codes, CodeError};
 
 pub mod bytecode_types;
 
 fn main() {
     println!("Hello, world!");
+}
+
+macro_rules! perform_op {
+    ($expression: expr, $op: tt) => {{
+        if let Some(x) = $expression.stack.pop() {
+            if let Some(y) = $expression.stack.pop() {
+                let val = y.value $op x.value; 
+                $expression.stack.push(Variable {
+                    variable: None,
+                    value: val 
+                });
+                None
+            }
+            else { Some (CodeError::StackUnderflow)}
+        }
+        else { Some (CodeError::StackUnderflow)}
+    }}
 }
 
 pub fn interpret(bytecodes: Vec<ByteCode>) -> Result<Variable> {
@@ -23,38 +40,37 @@ pub fn interpret(bytecodes: Vec<ByteCode>) -> Result<Variable> {
                 None
             },
             ByteCode::WriteVar(c) => {
-                let loaded_value = bytes.stack.pop().unwrap_or_else(|| CodeError::StackUnderflow);
+                let loaded_value = bytes.stack.pop().unwrap();
                 bytes.stack.push(Variable {
                     variable: Some(c),
-                    value: loaded_value
+                    value: loaded_value.value
                 });
                 None
             },
             ByteCode::ReadVar(c) => {
-                let read_value = bytes.stack.iter().find(|&&item| item.variable = Some(c)).unwrap_or_else(|| CodeError::VariableNotFound);
+                let read_value = bytes.stack.iter().find(|&&item| item.variable == Some(c)).unwrap();
                 bytes.stack.push(Variable {
-                    variable: Some(read_value.variable),
+                    variable: read_value.variable,
                     value: read_value.value
                 });
                 None
             },
-            ByteCode::Add => {
-
-            },
-            ByteCode::Sub => {
-
-            },
-            ByteCode::Mul => {
-
-            },
-            ByteCode::Div => {
-
-            },
-            ByteCode::Return => {
-
-            }
+            ByteCode::Add => perform_op!(bytes, +),
+            ByteCode::Sub => perform_op!(bytes, -),
+            ByteCode::Mul => perform_op!(bytes, *),
+            ByteCode::Div => perform_op!(bytes, /),
+            ByteCode::Return => break,
+        } {
+            return Err(CodeError::StackUnderflow);
         }
     };
-    Ok(())
+
+    if let Some(val) = bytes.stack.pop() {
+        Ok(val)
+    }
+    else {
+        Err(CodeError::StackUnderflow)
+    }
+
 
 }
