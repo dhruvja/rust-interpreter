@@ -27,6 +27,7 @@ pub struct Codes {
 #[derive(Debug)]
 pub enum CodeError {
     StackUnderflow,
+    VariableNotFound
 }
 
 pub type Result<T> = result::Result<T, CodeError>;
