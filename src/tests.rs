@@ -2,7 +2,7 @@
 mod interpreter_tests {
 
     // use super::*;
-    use crate::bytecode_types::{ByteCode::*, CodeError};
+    use crate::bytecode_types::{ByteCode::*, CodeError, Operations};
     use crate::interpret;
 
     #[test]
@@ -77,6 +77,54 @@ mod interpreter_tests {
         let instructions = vec![LoadVal(x), LoadVal(y), Mod, Return];
 
         assert_eq!(interpret(instructions).unwrap().value, remainder);
+    }
+
+    #[test]
+    fn test_add_loop() {
+        let mut x = 2;
+        let mut y = 4;
+
+        let orig_y = 4;
+        let orig_x = 2;
+
+        let start = 0;
+        let end = 3;
+
+        let mut sum = 0;
+
+        for i in start..end {
+            sum = x + y;
+            x = y;
+            y = sum;
+        }
+
+        let instructions = vec![LoadVal(orig_x),LoadVal(orig_y), Loop(start, end, Operations::Add), Return];
+
+        assert_eq!(interpret(instructions).unwrap().value, sum);
+    }
+
+    #[test]
+    fn test_mul_loop() {
+        let mut x = 2;
+        let mut y = 4;
+
+        let orig_y = 4;
+        let orig_x = 2;
+
+        let start = 0;
+        let end = 3;
+
+        let mut product = 0;
+
+        for i in start..end {
+            product = x * y;
+            x = y;
+            y = product;
+        }
+
+        let instructions = vec![LoadVal(orig_x),LoadVal(orig_y), Loop(start, end, Operations::Mul), Return];
+
+        assert_eq!(interpret(instructions).unwrap().value, product); 
     }
 
     #[test]

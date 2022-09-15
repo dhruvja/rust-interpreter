@@ -10,7 +10,17 @@ pub enum ByteCode {
 	Div,
 	Sub,
     Mod,
+    Loop(usize, usize, Operations),
     Return,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Operations{
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -19,7 +29,7 @@ pub struct Variable {
     pub value: i64,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Codes {
     pub bytecodes: Vec<ByteCode>,
     pub stack: Vec<Variable>,

@@ -1,4 +1,4 @@
-use crate::bytecode_types::{ByteCode, Variable, Result, Codes, CodeError};
+use crate::bytecode_types::{ByteCode, Variable, Result, Codes, CodeError, Operations};
 
 pub mod bytecode_types;
 pub mod tests;
@@ -23,6 +23,28 @@ macro_rules! perform_op {
         else { Some (CodeError::StackUnderflow)}
     }}
 }
+
+macro_rules! perform_loop_op {
+    ($expression: expr, $op: tt) => {{
+        let size = $expression.stack.len(); 
+        if let x = $expression.stack[size-1] {
+            if let y = $expression.stack.remove(size-2) {
+                let val = y.value $op x.value; 
+                println!("{} {}", x.value, y.value);
+                println!("{val}");
+                $expression.stack.push(Variable {
+                    variable: None,
+                    value: val 
+                });
+                None
+            }
+            else { Some (CodeError::StackUnderflow)}
+        }
+        else { Some (CodeError::StackUnderflow)}
+    }} 
+}
+
+
 
 pub fn interpret(bytecodes: Vec<ByteCode>) -> Result<Variable> {
 
@@ -61,6 +83,21 @@ pub fn interpret(bytecodes: Vec<ByteCode>) -> Result<Variable> {
             ByteCode::Mul => perform_op!(bytes, *),
             ByteCode::Div => perform_op!(bytes, /),
             ByteCode::Mod => perform_op!(bytes, %),
+            ByteCode::Loop(x,y, op) => {
+                for i in x..y {
+                    if let Some(err) = match op {
+                        Operations::Add => perform_loop_op!(bytes, +),
+                        Operations::Sub => perform_loop_op!(bytes, -),
+                        Operations::Mul => perform_loop_op!(bytes, *),
+                        Operations::Div => perform_loop_op!(bytes, /),
+                        Operations::Mod => perform_loop_op!(bytes, %)
+                        
+                    } {
+                        return Err(err);
+                    };
+                };
+                None
+            }
             ByteCode::Return => break,
         } {
             return Err(err);
