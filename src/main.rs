@@ -1,6 +1,7 @@
 use crate::bytecode_types::{ByteCode, Variable, Result, Codes, CodeError};
 
 pub mod bytecode_types;
+pub mod tests;
 
 fn main() {
     println!("Hello, world!");
@@ -59,9 +60,10 @@ pub fn interpret(bytecodes: Vec<ByteCode>) -> Result<Variable> {
             ByteCode::Sub => perform_op!(bytes, -),
             ByteCode::Mul => perform_op!(bytes, *),
             ByteCode::Div => perform_op!(bytes, /),
+            ByteCode::Mod => perform_op!(bytes, %),
             ByteCode::Return => break,
         } {
-            return Err(CodeError::StackUnderflow);
+            return Err(err);
         }
     };
 

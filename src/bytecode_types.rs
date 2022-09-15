@@ -9,6 +9,7 @@ pub enum ByteCode {
     Mul,
 	Div,
 	Sub,
+    Mod,
     Return,
 }
 
@@ -24,7 +25,7 @@ pub struct Codes {
     pub stack: Vec<Variable>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum CodeError {
     StackUnderflow,
     VariableNotFound
