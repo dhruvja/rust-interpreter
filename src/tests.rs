@@ -4,6 +4,7 @@ mod interpreter_tests {
     // use super::*;
     use crate::bytecode_types::{ByteCode::*, CodeError, Operations};
     use crate::bytecode_interpreter::interpret;
+    use crate::file_line_count::find_files_with_extension_and_count_lines;
 
     #[test]
     fn test_err_no_value_loaded() {
@@ -148,4 +149,13 @@ mod interpreter_tests {
 
         assert_eq!(interpret(instructions).unwrap().value, result);
     }
+
+    #[test]
+    fn test_file_line_count() {
+        let directory_path = "./test";
+        let extension = "txt";
+        
+        find_files_with_extension_and_count_lines(directory_path, extension);
+    }
+
 }
