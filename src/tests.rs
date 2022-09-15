@@ -3,7 +3,7 @@ mod interpreter_tests {
 
     // use super::*;
     use crate::bytecode_types::{ByteCode::*, CodeError, Operations};
-    use crate::interpret;
+    use crate::bytecode_interpreter::interpret;
 
     #[test]
     fn test_err_no_value_loaded() {
